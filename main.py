@@ -1,5 +1,5 @@
 import streamlit as st
-from langchain.vectorstores import Chroma
+# from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.document_loaders import PyPDFLoader
@@ -10,6 +10,7 @@ import re
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
 from io import BytesIO, StringIO
+from langchain.vectorstores import FAISS
 
 def finish_sentence(sentence):
     cleaned_sentence = re.sub(r'/n', ' ', sentence)
@@ -19,6 +20,11 @@ def finish_sentence(sentence):
 
 
 import tomli
+
+# with open("config.toml", "rb") as f:
+#     config = tomli.load(f)
+
+# api_key = config["openai"]["api_key"]
 
 api_key = st.secrets["openai"]["api_key"]
 
@@ -59,7 +65,7 @@ def main():
         PROMPT = PromptTemplate(
             template=prompt_template, input_variables=["context", "question"]
         )
-        docsearch = Chroma.from_documents(texts, embeddings)
+        docsearch = FAISS.from_documents(texts, embeddings)
         chain_type_kwargs = {"prompt": PROMPT}
         qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=docsearch.as_retriever(search_type="mmr", search_kwargs={'k': 8, 'fetch_k': 50}), chain_type_kwargs=chain_type_kwargs)
         result = qa({"query": label})
