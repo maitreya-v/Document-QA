@@ -11,38 +11,37 @@ from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
 from io import BytesIO, StringIO
 
-# Set your OpenAI API key
-openai.api_key = "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"
-
-# Function to clean and format the sentence
 def finish_sentence(sentence):
     cleaned_sentence = re.sub(r'/n', ' ', sentence)
     cleaned_sentence = re.sub(r'\s+', ' ', cleaned_sentence).strip()
     cleaned_sentence = re.sub(r'\.[^.]*$', '.', cleaned_sentence)
     return cleaned_sentence
 
-# Streamlit app
+
+import tomli
+
+api_key = st.secrets["openai"]["api_key"]
+
 def main():
+    
     st.title("PDF Text Processing App")
     
-    # Upload a PDF file
     pdf_file = st.file_uploader("Upload a PDF file", type=["pdf"])
     if pdf_file is not None:
         st.text("Processing the PDF file...")
         pdf_content_bytesio = BytesIO(pdf_file.read())
 
-        # Save the BytesIO content to a temporary file
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
             temp_file.write(pdf_content_bytesio.getvalue())
             temp_file_path = temp_file.name
         label = st.text_input("Question:", "")
 
-        llm = OpenAI(model_name="gpt-3.5-turbo", openai_api_key=openai.api_key)
+        llm = OpenAI(model_name="gpt-3.5-turbo", openai_api_key=api_key)
         loader = PyPDFLoader(temp_file_path)
         documents = loader.load()
         text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
         texts = text_splitter.split_documents(documents)
-        embeddings = OpenAIEmbeddings(openai_api_key=openai.api_key)
+        embeddings = OpenAIEmbeddings(openai_api_key=api_key)
 
         prompt_template = """
         %INSTRUCTIONS
@@ -66,7 +65,6 @@ def main():
         result = qa({"query": label})
         ans = finish_sentence(result['result'])
 
-        # Display the result
         st.header("Output:")
         st.text("The processed answer:")
         st.write(ans)
