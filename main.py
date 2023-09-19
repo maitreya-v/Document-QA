@@ -21,12 +21,12 @@ def finish_sentence(sentence):
 
 import tomli
 
-# with open("config.toml", "rb") as f:
-#     config = tomli.load(f)
+with open("config.toml", "rb") as f:
+    config = tomli.load(f)
 
-# api_key = config["openai"]["api_key"]
+api_key = config["openai"]["api_key"]
 
-api_key = st.secrets["openai"]["api_key"]
+# api_key = st.secrets["openai"]["api_key"]
 
 def main():
     

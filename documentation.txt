@@ -1,0 +1,12 @@
+To access the api key i created config.toml file and saved the api_key
+
+First splitting the entire pdf text into chunks and then converting them to vectors
+
+If you want to save the vectors you can use vectorstores for storing i have used FAISS for temporary storage, if you want permanent storage of those vectors you can create a .faiss file which stores all the vectors and increases efficiency in answer retrieval 
+
+Fetching 50 relevant sentences and out of those only 8 most relevant sentences will be sent to openai as context to answer the questions and to increase cost efficiency
+
+Put the openai api key in config.toml
+
+After doing pip install -r requirements.txt
+Run streamlit run main.py
